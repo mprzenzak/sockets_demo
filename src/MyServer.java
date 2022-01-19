@@ -108,7 +108,7 @@ class MyServer extends JFrame implements ActionListener, Runnable {
 		// inicjalizacja po³¹czeñ sieciowych
 		try (ServerSocket serwer = new ServerSocket(SERVER_PORT)) {
 			String host = InetAddress.getLocalHost().getHostName();
-			System.out.println("Serwer zosta³ uruchomiony na hoscie " + host);
+			System.out.println("Serwer zosta? uruchomiony na hoscie " + host);
 			socket_created = true;
 			// koniec inicjalizacji po³¹czeñ sieciowych
 
