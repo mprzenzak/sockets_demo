@@ -105,25 +105,25 @@ class MyServer extends JFrame implements ActionListener, Runnable {
 	public void run() {
 		boolean socket_created = false;
 	
-		// inicjalizacja po³¹czeñ sieciowych
+		// inicjalizacja poï¿½ï¿½czeï¿½ sieciowych
 		try (ServerSocket serwer = new ServerSocket(SERVER_PORT)) {
 			String host = InetAddress.getLocalHost().getHostName();
-			System.out.println("Serwer zosta? uruchomiony na hoscie " + host);
+			System.out.println("Serwer zostaï¿½ uruchomiony na hoscie " + host);
 			socket_created = true;
-			// koniec inicjalizacji po³¹czeñ sieciowych
+			// koniec inicjalizacji poï¿½ï¿½czeï¿½ sieciowych
 
-			while (true) {  // oczekiwanie na po³¹czenia przychdz¹ce od klientów
+			while (true) {  // oczekiwanie na poï¿½ï¿½czenia przychdzï¿½ce od klientï¿½w
 				Socket socket = serwer.accept();
 				if (socket != null) {
-					// Tworzy nowy w¹tek do obs³ugi klienta, które
-					// w³aœnie po³¹czy³ siê z serwerem.
+					// Tworzy nowy wï¿½tek do obsï¿½ugi klienta, ktï¿½re
+					// wï¿½aï¿½nie poï¿½ï¿½czyï¿½ siï¿½ z serwerem.
 					new ClientThread(this, socket);
 				}
 			}
 		} catch (IOException e) {
 			System.out.println(e);
 			if (!socket_created) {
-				JOptionPane.showMessageDialog(null, "Gniazdko dla serwera nie mo¿e byæ utworzone");
+				JOptionPane.showMessageDialog(null, "Gniazdko dla serwera nie moï¿½e byï¿½ utworzone");
 				System.exit(0);
 			} else {
 				JOptionPane.showMessageDialog(null, "BLAD SERWERA: Nie mozna polaczyc sie z klientem ");
@@ -143,7 +143,7 @@ class ClientThread implements Runnable {
 	private ObjectOutputStream outputStream = null;
 	
 	// UWAGA: Ten konstruktor tworzy nieaktywny obiekt ClientThread,
-	// który posiada tylko nazwê prototypow¹, potrzebn¹ dla
+	// ktï¿½ry posiada tylko nazwï¿½ prototypowï¿½, potrzebnï¿½ dla
 	// metody setPrototypeDisplayValue z klasy JComboBox
 	ClientThread(String prototypeDisplayValue){
 		name = prototypeDisplayValue;
@@ -187,7 +187,7 @@ class ClientThread implements Runnable {
 				myServer.printReceivedMessage(this,message);
 				if (message.equals("exit")){
 					myServer.removeClient(this);
-					break;		
+					break;
 				}
 			}
 			socket.close();

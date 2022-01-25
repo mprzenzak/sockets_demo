@@ -1,6 +1,12 @@
-//wysyłanie ciągu zleceń tekstowych do serwera i
-//wyświetlanie komunikatów tekstowych z odpowiedziami serwera
-
+/*
+ * Program: Apliakcja typu „klient-serwer” realizującą funkcję prostej książki telefonicznej
+ *    Plik: PhoneBookClient.java
+ *          - definicja klasy PhoneBookClient, program klienta tworzący gniazda i realizujący komunikację z serwerem
+ *
+ *    Autor: Mikołaj Przenzak
+ *    indeks: 259066
+ *    Data: 25.01.2022 r.
+ */
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +21,7 @@ import java.net.Socket;
 public class PhoneBookClient extends JFrame implements ActionListener, Runnable {
 
     private JTextField messageField = new JTextField(20);
-    private JTextArea  textArea     = new JTextArea(15,18);
+    private JTextArea textArea = new JTextArea(15, 18);
 
     static final int SERVER_PORT = 25000;
     private String name;
@@ -31,12 +37,12 @@ public class PhoneBookClient extends JFrame implements ActionListener, Runnable 
         host = JOptionPane.showInputDialog("Podaj adres serwera");
         name = JOptionPane.showInputDialog("Podaj nazwe klienta");
         if (name != null && !name.equals("")) {
-            new MyClient(name, host);
+            new PhoneBookClient(name, host);
         }
     }
 
     PhoneBookClient(String name, String host) {
-        //super(name)
+        super(name);
         this.name = name;
         this.serverHost = host;
         setSize(300, 310);
@@ -58,6 +64,7 @@ public class PhoneBookClient extends JFrame implements ActionListener, Runnable 
                 windowClosing(event);
             }
         });
+
         JPanel panel = new JPanel();
         JLabel messageLabel = new JLabel("Napisz:");
         JLabel textAreaLabel = new JLabel("Dialog:");
@@ -72,17 +79,67 @@ public class PhoneBookClient extends JFrame implements ActionListener, Runnable 
         panel.add(scroll_bars);
         setContentPane(panel);
         setVisible(true);
-        new Thread(this).start();  // Uruchomienie dodatkowego w¹tka
-        // do oczekiwania na komunikaty od serwera
+        new Thread(this).start();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
+    synchronized public void printReceivedMessage(String message) {
+        String tmp_text = textArea.getText();
+        textArea.setText(tmp_text + ">>> " + message + "\n");
     }
 
-    @Override
+    synchronized public void printSentMessage(String message) {
+        String text = textArea.getText();
+        textArea.setText(text + "<<< " + message + "\n");
+    }
+
+    public void actionPerformed(ActionEvent event) {
+        String message;
+        Object source = event.getSource();
+        if (source == messageField) {
+            try {
+                message = messageField.getText();
+                outputStream.writeObject(message);
+                printSentMessage(message);
+            } catch (IOException e) {
+                System.out.println("Wyjatek klienta " + e);
+            }
+        }
+        repaint();
+    }
+
     public void run() {
-
+        if (serverHost.equals("")) {
+            serverHost = "localhost";
+        }
+        try {
+            socket = new Socket(serverHost, SERVER_PORT);
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.writeObject(name);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Polaczenie sieciowe dla klienta nie moze byc utworzone");
+            setVisible(false);
+            dispose();
+            return;
+        }
+        try {
+            while (true) {
+                String message = (String) inputStream.readObject();
+                printReceivedMessage(message);
+                if (message.equals("exit")) {
+                    inputStream.close();
+                    outputStream.close();
+                    socket.close();
+                    setVisible(false);
+                    dispose();
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Polaczenie sieciowe dla klienta zostalo przerwane");
+            setVisible(false);
+            dispose();
+        }
     }
+
 }
